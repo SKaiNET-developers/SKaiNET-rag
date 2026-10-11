@@ -1,0 +1,39 @@
+[versions]
+kotlin = "2.4.20"
+agp = "9.3.2"
+composeMultiplatform = "1.12.1"
+activityCompose = "1.11.0"
+kotlinxSerialization = "1.11.0"
+coroutines = "1.11.0"
+kotlinxDatetime = "0.7.1"
+skainet = "0.57.0"
+cartridgeBlueprints = "0.1.0-SNAPSHOT"
+
+[libraries]
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
+skainet-bom = { group = "sk.ainet", name = "skainet-bom", version.ref = "skainet" }
+skainet-lang-core = { group = "sk.ainet.core", name = "skainet-lang-core" }
+skainet-backend-cpu = { group = "sk.ainet.core", name = "skainet-backend-cpu" }
+# From ~/.m2 (skainet-cartridge-blueprints publishToMavenLocal); see settings.gradle.kts.
+cartridge-embedding-leaf = { group = "sk.ainet.cartridge", name = "embedding-leaf-skainet", version.ref = "cartridgeBlueprints" }
+
+[libraries.androidx-activity-compose]
+group = "androidx.activity"
+name = "activity-compose"
+version.ref = "activityCompose"
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+[plugins.android-kotlin-multiplatform-library]
+id = "com.android.kotlin.multiplatform.library"
+version.ref = "agp"

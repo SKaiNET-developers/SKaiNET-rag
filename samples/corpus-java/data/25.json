@@ -1,0 +1,238 @@
+{
+	"version": "25",
+	"name": "Java 25",
+	"ga": "2025-09-16",
+	"eol": "2030-09",
+	"umbrellajsr": "400",
+	"latestversion": "25.0.4.1",
+	"status": "LTS",
+	"bytecode": "69.0",
+	"unicode": "16.0.0",
+	"documentation": {
+		"notes": "https://www.oracle.com/java/technologies/javase/25u-relnotes.html",
+		"vm": "https://docs.oracle.com/javase/specs/jvms/se25/html/index.html",
+		"lang": "https://docs.oracle.com/javase/specs/jls/se25/html/index.html",
+		"api": "https://docs.oracle.com/en/java/javase/25/docs/api/",
+		"tools": "https://docs.oracle.com/en/java/javase/25/docs/specs/man/index.html"
+	},
+	"scm": [
+		{
+			"type": "git",
+			"url": "https://github.com/openjdk/jdk25u"
+		}
+	],
+	"updates": [
+		{
+			"version": "25",
+			"tag": "jdk-25-ga",
+			"date": "2025-09-16"
+		},
+		{
+			"version": "25.0.1",
+			"tag": "jdk-25.0.1-ga",
+			"date": "2025-10-22"
+		},
+		{
+			"version": "25.0.2",
+			"tag": "jdk-25.0.2-ga",
+			"date": "2026-01-20"
+		},
+		{
+			"version": "25.0.3",
+			"tag": "jdk-25.0.3-ga",
+			"date": "2026-04-17"
+		},
+		{
+			"version": "25.0.4",
+			"tag": "jdk-25.0.4-ga",
+			"date": "2026-07-21"
+		},
+		{
+			"version": "25.0.4.1",
+			"tag": "jdk-25.0.4.1-ga",
+			"date": "2026-08-07"
+		}
+	],
+	"features": [
+		{
+			"title": "PEM Encodings of Cryptographic Objects",
+			"category": "api",
+			"preview": true,
+			"revision": 1,
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "470"
+				}
+			]
+		},
+		{
+			"title": "Stable Values",
+			"category": "api",
+			"preview": true,
+			"revision": 1,
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "502"
+				}
+			]
+		},
+		{
+			"title": "Remove the 32-bit x86 Port",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "503"
+				}
+			]
+		},
+		{
+			"title": "Structured Concurrency",
+			"category": "api",
+			"preview": true,
+			"revision": 5,
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "505"
+				}
+			]
+		},
+		{
+			"title": "Scoped Values",
+			"category": "api",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "506"
+				}
+			]
+		},
+		{
+			"title": "Primitive Types in Patterns, instanceof, and switch",
+			"category": "lang",
+			"preview": true,
+			"revision": 3,
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "507"
+				}
+			]
+		},
+		{
+			"title": "Vector API",
+			"category": "api",
+			"incubator": true,
+			"revision": 10,
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "508"
+				}
+			]
+		},
+		{
+			"title": "Key Derivation Function API",
+			"category": "api",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "510"
+				}
+			]
+		},
+		{
+			"title": "Module Import Declarations",
+			"category": "lang",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "511"
+				}
+			]
+		},
+		{
+			"title": "Compact Source Files and Instance Main Methods",
+			"category": "lang",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "512"
+				}
+			]
+		},
+		{
+			"title": "Flexible Constructor Bodies",
+			"category": "lang",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "513"
+				}
+			]
+		},
+		{
+			"title": "Ahead-of-Time Command-Line Ergonomics",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "514"
+				}
+			]
+		},
+		{
+			"title": "Ahead-of-Time Method Profiling",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "515"
+				}
+			]
+		},
+		{
+			"title": "JFR Cooperative Sampling",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "518"
+				}
+			]
+		},
+		{
+			"title": "Compact Object Headers",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "519"
+				}
+			]
+		},
+		{
+			"title": "JFR Method Timing \u0026 Tracing",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "520"
+				}
+			]
+		},
+		{
+			"title": "Generational Shenandoah",
+			"category": "jvm",
+			"refs": [
+				{
+					"type": "JEP",
+					"identifier": "521"
+				}
+			]
+		}
+	]
+}
