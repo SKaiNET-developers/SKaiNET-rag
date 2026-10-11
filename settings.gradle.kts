@@ -49,6 +49,7 @@ rootProject.name = "skainet-localrag"
 include(":rag-core")
 include(":rag-embedder-skainet")
 include(":rag-embedder-leaf")
+include(":rag-generator-smollm2")
 include(":rag-runtime")
 include(":rag-bundler")
 include(":samples:cli")

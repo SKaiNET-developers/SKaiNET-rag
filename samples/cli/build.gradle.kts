@@ -10,6 +10,11 @@ kotlin {
             mainClass.set("sk.ainet.rag.sample.cli.MainJvmKt")
         }
     }
+
+    // SKaiNET picks SIMD kernels where the JVM offers them — generation is minutes vs. seconds.
+    tasks.withType<JavaExec>().configureEach {
+        jvmArgs("--add-modules", "jdk.incubator.vector")
+    }
     macosArm64 {
         binaries {
             executable {
@@ -22,6 +27,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":rag-runtime"))
             implementation(project(":rag-embedder-leaf"))
+            implementation(project(":rag-generator-smollm2"))
             implementation(libs.kotlinx.coroutines.core)
         }
     }

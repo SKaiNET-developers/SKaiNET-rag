@@ -20,6 +20,7 @@ skainet-lang-core = { group = "sk.ainet.core", name = "skainet-lang-core" }
 skainet-backend-cpu = { group = "sk.ainet.core", name = "skainet-backend-cpu" }
 # From ~/.m2 (skainet-cartridge-blueprints publishToMavenLocal); see settings.gradle.kts.
 cartridge-embedding-leaf = { group = "sk.ainet.cartridge", name = "embedding-leaf-skainet", version.ref = "cartridgeBlueprints" }
+cartridge-generator-smollm2 = { group = "sk.ainet.cartridge", name = "generator-smollm2-skainet", version.ref = "cartridgeBlueprints" }
 
 [libraries.androidx-activity-compose]
 group = "androidx.activity"
