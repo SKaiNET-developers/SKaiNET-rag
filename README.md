@@ -12,8 +12,8 @@ pure retrieval behind the `Embedder`/`Generator` seams, and anything needing wei
 inference runtime enters as a `rag-embedder-*`/`rag-generator-*` edge module consuming a
 cartridge from Maven.
 
-Targets: **jvm · iosArm64 · iosSimulatorArm64 · macosArm64** (Android consumes the jvm
-artifacts; D8 dexes Java 21 bytecode).
+Targets: **jvm · iosArm64 · iosSimulatorArm64 · macosArm64 · wasmJs** (Android consumes the
+jvm artifacts; D8 dexes Java 21 bytecode; the browser runs the retrieval stack as Wasm).
 
 ## Modules
 
@@ -27,6 +27,7 @@ artifacts; D8 dexes Java 21 bytecode).
 | `samples/corpus-java` | The demo-corpus generator: vendored [Java Version Almanac](https://javaalmanac.io) JSON (LTS releases 8–25, CC BY-SA 4.0) in, Markdown documents out — facts from the data, prose from templates in this repo, deterministic for a given snapshot. Output is checked in under `samples/docs-java`. |
 | `samples/cli` | One common-source CLI compiled both as a JVM app and a **native macosArm64 executable**, answering from the same bundle. |
 | `samples/app` | The **Compose Multiplatform** sample: the entire UI (search screen, status, passage cards) is one `commonMain` `App()` composable shared by Android, desktop and iOS; the bundle ships as a compose resource so every target loads identical bytes. `samples/app-android` is the thin `com.android.application` shell AGP 9 requires (KMP module + application plugin cannot share a module). |
+| `samples/web` | The **browser demo**: the same `LocalRag` runtime compiled to Kotlin/Wasm behind a static HTML page — hybrid retrieval (BM25 + SKaiNET HRP vectors, ~700 KB of script + wasm) entirely in the tab, serving the same checked-in bundle the apps ship. `?q=…` deep-links a query. `wasmJsBrowserDistribution` emits a folder any static host (GitHub Pages included — see `.github/workflows/pages.yml`) serves as-is. |
 
 ## Quick start
 
@@ -36,6 +37,15 @@ artifacts; D8 dexes Java 21 bytecode).
 ./gradlew :rag-bundler:run --args="--docs $PWD/samples/docs-java --out $PWD/build/demo/docs.lrb --content-version 1 --categories release,jvm,language,api,tools,internal"
 ./gradlew :samples:cli:jvmRun --args="$PWD/build/demo/docs.lrb 'which JEP introduced virtual threads'"
 ./samples/cli/build/bin/macosArm64/releaseExecutable/cli.kexe build/demo/docs.lrb "class file version of Java 17"
+```
+
+The same retrieval in the browser — build the Wasm demo and serve it from any static file
+server (everything after the one corpus fetch stays in the tab):
+
+```bash
+./gradlew :samples:web:wasmJsBrowserDistribution
+python3 -m http.server -d samples/web/build/dist/wasmJs/productionExecutable 8080
+open "http://localhost:8080/?q=which+JEP+introduced+virtual+threads"
 ```
 
 The same corpus with **neural vectors** instead of the hashed projection — publish the

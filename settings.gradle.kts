@@ -15,6 +15,7 @@ pluginManagement {
     // unknown version" once more than one plugin ID from the same jar is used.
     plugins {
         id("sk.ainet.multiplatform") version "1.1.0"
+        id("sk.ainet.npm-pins") version "1.1.0"
     }
 }
 
@@ -41,6 +42,27 @@ dependencyResolutionManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
+        // The wasmJs toolchain downloads (Node.js, Yarn, Binaryen) declared here, where every
+        // other repository lives; the Kotlin plugin's own per-project registration is switched
+        // off in the root build script, keeping FAIL_ON_PROJECT_REPOS in force.
+        ivy("https://nodejs.org/dist") {
+            name = "nodeDistributions"
+            patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("org.nodejs", "node") }
+        }
+        ivy("https://github.com/yarnpkg/yarn/releases/download") {
+            name = "yarnDistributions"
+            patternLayout { artifact("v[revision]/[artifact](-v[revision]).[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("com.yarnpkg", "yarn") }
+        }
+        ivy("https://github.com/WebAssembly/binaryen/releases/download") {
+            name = "binaryenDistributions"
+            patternLayout { artifact("version_[revision]/binaryen-version_[revision]-[classifier].[ext]") }
+            metadataSources { artifact() }
+            content { includeModule("com.github.webassembly", "binaryen") }
+        }
     }
 }
 
@@ -56,3 +78,4 @@ include(":samples:cli")
 include(":samples:corpus-java")
 include(":samples:app")
 include(":samples:app-android")
+include(":samples:web")
