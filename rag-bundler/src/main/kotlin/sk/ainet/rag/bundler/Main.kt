@@ -11,11 +11,9 @@ import sk.ainet.rag.core.document.DocumentValidator
 import sk.ainet.rag.core.document.FrontMatterParser
 import sk.ainet.rag.core.document.ParsedDocument
 import sk.ainet.rag.core.document.ValidationConfig
-import sk.ainet.cartridge.embedding.leaf.LeafEmbeddingCartridge
 import sk.ainet.rag.embedder.skainet.SkaiNetHashedProjectionEmbedder
 import java.io.File
 import kotlin.system.exitProcess
-import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 
@@ -127,41 +125,12 @@ private fun embedWithHrp(chunks: List<Chunk>, dimensions: Int): Pair<EmbeddingIn
     return info to vectors
 }
 
-/**
- * The mdbr-leaf-ir neural encoder, arriving as the embedding-leaf-skainet cartridge from the
- * local Maven repository. Needs the pinned model snapshot on disk (the blueprint's fetch step);
- * the manifest block is derived from the cartridge's intrinsic descriptor, so the runtime-side
- * parity check compares like with like.
- */
-private fun embedWithLeaf(chunks: List<Chunk>): Pair<EmbeddingInfo, FloatArray> {
-    val descriptor = LeafEmbeddingCartridge.descriptor
-    val info = EmbeddingInfo(
-        modelId = LeafEmbeddingCartridge.SPACE_FINGERPRINT,
-        dimensions = descriptor.dimensions,
-        normalized = descriptor.normalized,
-        queryPrefix = descriptor.queryPrefix,
-        documentPrefix = descriptor.documentPrefix,
-    )
-    val vectors = try {
-        runBlocking {
-            LeafEmbeddingCartridge.open().use { engine ->
-                val all = FloatArray(chunks.size * engine.dimensions)
-                chunks.forEachIndexed { index, chunk ->
-                    engine.embed(descriptor.documentPrefix + chunk.embeddedText)
-                        .copyInto(all, index * engine.dimensions)
-                }
-                all
-            }
-        }
-    } catch (failure: IllegalStateException) {
-        fail("leaf embedder: ${failure.message}")
-    }
-    return info to vectors
-}
+// embedWithLeaf lives in src/main-leaf (the cartridge-backed implementation) or
+// src/main-noleaf (a runtime refusal), selected by -Plocalrag.noLeaf in the build script.
 
 internal enum class EmbedderKind { HRP, LEAF }
 
-private fun fail(message: String): Nothing {
+internal fun fail(message: String): Nothing {
     System.err.println("rag-bundler: $message")
     exitProcess(1)
 }
