@@ -1,0 +1,79 @@
+# Builds the demo corpus, indexes it into the LRB2 bundle (embeddings computed in-process
+# through the same HRP embedder the page runs), compiles the Kotlin/Wasm demo (:samples:web)
+# and publishes it to GitHub Pages — so the repo's front door is the retrieval stack running
+# live in the visitor's browser, over a bundle indexed by this very workflow.
+#
+# One-time setup: repository Settings → Pages → Source: "GitHub Actions".
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+
+      # --last-reviewed is pinned to the checked-in corpus date: the generator is deterministic
+      # for a given snapshot only once the review stamp stops tracking the wall clock.
+      - name: Generate the demo corpus
+        run: >
+          ./gradlew :samples:corpus-java:run
+          --args="--data $PWD/samples/corpus-java/data --out $PWD/samples/docs-java
+          --last-reviewed 2026-10-10"
+
+      # -Plocalrag.noLeaf: the embedding-leaf-skainet cartridge lives only in a developer's
+      # ~/.m2, so CI compiles the bundler without the leaf edge module and indexes with the
+      # weight-free HRP embedder — the same embedder the published page runs. --built-at is
+      # pinned for the byte-identity check below.
+      - name: Index the corpus into the bundle (HRP embeddings in-process)
+        run: >
+          ./gradlew -Plocalrag.noLeaf=true :rag-bundler:run
+          --args="--docs $PWD/samples/docs-java
+          --out $PWD/samples/app/src/commonMain/composeResources/files/docs.lrb
+          --content-version 1
+          --categories release,jvm,language,api,tools,internal
+          --built-at 2026-10-10T16:57:00.295376Z"
+
+      # The LRB2 encoding is deterministic (identical content → identical bytes), so a
+      # reindex of unchanged sources must reproduce the checked-in bundle bit for bit.
+      # A diff here means the toolchain drifted — exactly what should fail loudly.
+      - name: Verify the reindexed corpus and bundle match the checked-in bytes
+        run: >
+          git diff --exit-code --
+          samples/docs-java
+          samples/app/src/commonMain/composeResources/files/docs.lrb
+
+      - name: Build the wasm distribution
+        run: ./gradlew :samples:web:wasmJsBrowserDistribution
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: samples/web/build/dist/wasmJs/productionExecutable
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
