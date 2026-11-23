@@ -7,7 +7,7 @@
  * result list classes `search-result-dropdown-menu` / `search-result-item` /
  * `search-result-document-title` / `search-result-document-hit`, input `#search-input`,
  * facet checkbox `input[data-facet-filter="component:<name>"]` inside `#search-field`.
- * The engine (~250 KB compressed) loads lazily on first focus — a visitor who never searches
+ * The engine (~155 KB compressed) loads lazily on first focus — a visitor who never searches
  * pays nothing.
  */
 

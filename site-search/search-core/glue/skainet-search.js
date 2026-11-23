@@ -3,7 +3,7 @@
  *
  * This is the only module consumers script against; the Kotlin/Wasm core behind it
  * (skainet-search-core.mjs, loaded lazily on init) is an implementation detail whose envelope
- * protocol may change. Importing this file costs ~2 KB; the engine (~250 KB compressed wasm+js)
+ * protocol may change. Importing this file costs ~2 KB; the engine (~155 KB compressed wasm+js)
  * loads on the first `init()` call, so a page can import eagerly and init on first focus.
  *
  *   import { skainetSearch } from './skainet-search.js';
