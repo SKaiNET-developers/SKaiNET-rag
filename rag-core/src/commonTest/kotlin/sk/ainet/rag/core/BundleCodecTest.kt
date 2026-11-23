@@ -112,6 +112,40 @@ class BundleCodecTest {
     }
 
     @Test
+    fun `site metadata round trips and absent fields write no json`() {
+        val sited = Fixture.chunks.first().copy(
+            component = "skainet",
+            componentVersion = "0.57",
+            headingPath = listOf("Install", "Prerequisites"),
+        )
+        val decoded = BundleCodec.decode(
+            BundleCodec.encode(
+                chunks = listOf(sited),
+                vectors = null,
+                clusters = emptyList(),
+                contentVersion = 1,
+                builtAt = "now",
+                embedding = null,
+            ),
+        ).chunks.single()
+        assertEquals("skainet", decoded.component)
+        assertEquals("0.57", decoded.componentVersion)
+        assertEquals(listOf("Install", "Prerequisites"), decoded.headingPath)
+
+        // A chunk without site metadata serializes to exactly the pre-site bytes.
+        val bare = BundleCodec.encode(
+            chunks = listOf(Fixture.chunks.first()),
+            vectors = null,
+            clusters = emptyList(),
+            contentVersion = 1,
+            builtAt = "now",
+            embedding = null,
+        ).decodeToString()
+        assertTrue("component" !in bare)
+        assertTrue("headingPath" !in bare)
+    }
+
+    @Test
     fun `refuses vectors without an embedding block`() {
         assertFailsWith<IllegalArgumentException> {
             BundleCodec.encode(

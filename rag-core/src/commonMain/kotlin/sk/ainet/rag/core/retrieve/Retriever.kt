@@ -74,6 +74,9 @@ class Retriever(
             source = source,
             urlPath = chunk.urlPath,
             anchor = chunk.anchor,
+            component = chunk.component,
+            componentVersion = chunk.componentVersion,
+            headingPath = chunk.headingPath,
         )
     }
 

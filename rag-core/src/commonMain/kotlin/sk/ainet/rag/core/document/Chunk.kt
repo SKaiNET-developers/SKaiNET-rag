@@ -29,4 +29,10 @@ data class Chunk(
     val urlPath: String? = null,
     /** Fragment identifier of the chunk's heading on that page, without the `#`; null for the intro. */
     val anchor: String? = null,
+    /** Site facet the page belongs to (an Antora component); null outside multi-component sites. */
+    val component: String? = null,
+    /** Version label of that component — display metadata, distinct from appVersionMin/Max gating. */
+    val componentVersion: String? = null,
+    /** Full heading trail above this chunk, outermost first; [heading] stays its last element. */
+    val headingPath: List<String>? = null,
 )

@@ -105,6 +105,12 @@ data class Passage(
     val urlPath: String? = null,
     /** Fragment id of the passage's heading on that page, without the `#`. */
     val anchor: String? = null,
+    /** Site facet (an Antora component) the page belongs to; the key `categories` filters on. */
+    val component: String? = null,
+    /** Display version label of that component. */
+    val componentVersion: String? = null,
+    /** Heading trail above the passage, outermost first — breadcrumb material for search UIs. */
+    val headingPath: List<String>? = null,
 ) {
     /** Ready-to-render link to the passage on its page, or null without URL metadata. */
     val href: String?

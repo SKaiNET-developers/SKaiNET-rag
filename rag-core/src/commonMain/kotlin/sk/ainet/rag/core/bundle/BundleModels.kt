@@ -61,6 +61,11 @@ data class StoredChunk(
     // bundles without site metadata keep their exact bytes and older runtimes read newer bundles.
     val urlPath: String? = null,
     val anchor: String? = null,
+    val component: String? = null,
+    val componentVersion: String? = null,
+    // Nullable rather than emptyList(): encodeDefaults = true would write an empty list on
+    // every chunk, breaking byte-identity for bundles that never set it.
+    val headingPath: List<String>? = null,
 ) {
     companion object {
         fun from(chunk: Chunk) = StoredChunk(
@@ -76,6 +81,9 @@ data class StoredChunk(
             text = chunk.displayText,
             urlPath = chunk.urlPath,
             anchor = chunk.anchor,
+            component = chunk.component,
+            componentVersion = chunk.componentVersion,
+            headingPath = chunk.headingPath,
         )
     }
 }
