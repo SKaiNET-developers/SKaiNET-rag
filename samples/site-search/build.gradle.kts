@@ -13,7 +13,9 @@ plugins {
 kotlin {
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
-        outputModuleName.set("app")
+        // Unique across the build: compiled modules sync into the shared build/wasm/packages/<name>,
+        // and two modules named "app" collide. The served file stays app.js via outputFileName.
+        outputModuleName.set("site-search")
         browser {
             commonWebpackConfig {
                 outputFileName = "app.js"
