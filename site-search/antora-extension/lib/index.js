@@ -116,6 +116,10 @@ function collectPages (contentCatalog, { indexAllVersions }) {
     })
     if (record) records.push(record)
   }
+  // The catalog's page order is not deterministic across runs (content aggregation is
+  // concurrent); the bundle encoding is order-sensitive, so impose one. docId is unique
+  // per page (component:module:relative).
+  records.sort((a, b) => (a.docId < b.docId ? -1 : a.docId > b.docId ? 1 : 0))
   return records
 }
 

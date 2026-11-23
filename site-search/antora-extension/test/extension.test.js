@@ -108,8 +108,16 @@ test('beforePublish indexes the rendered pages and publishes the engine', { skip
   // Determinism: the same catalogs index to the same bytes when the clock is pinned.
   process.env.SOURCE_DATE_EPOCH = '1764000000'
   try {
-    const again = fakeCatalogs([fakePage()])
-    const andAgain = fakeCatalogs([fakePage()])
+    const otherPage = () =>
+      fakePage({
+        title: 'Architecture',
+        src: { component: 'skainet', version: '0.57', module: 'ROOT', relative: 'architecture.adoc' },
+        pub: { url: '/skainet/0.57/architecture.html' },
+      })
+    const again = fakeCatalogs([fakePage(), otherPage()])
+    // Same pages, opposite catalog order: Antora's content aggregation is concurrent and the
+    // real catalog's order varies run to run, so the bundle must not depend on it.
+    const andAgain = fakeCatalogs([otherPage(), fakePage()])
     await ctx.listeners.beforePublish(again)
     await ctx.listeners.beforePublish(andAgain)
     const bytesOf = (c) => c.siteCatalog.files.find((f) => f.out.path === '_search/search.lrb').contents
