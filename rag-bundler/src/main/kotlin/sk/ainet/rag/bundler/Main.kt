@@ -44,7 +44,7 @@ fun main(args: Array<String>) {
     for (file in sources) {
         val result = FrontMatterParser.parse(file.relativeTo(docsDir).path, file.readText())
         issues += result.issues
-        val document = result.document ?: continue
+        val document = result.document?.let { withUrl(it, options) } ?: continue
         if (document.status == DocumentStatus.PUBLISHED) documents += document
     }
 
@@ -106,6 +106,18 @@ fun main(args: Array<String>) {
     )
 }
 
+/**
+ * Resolves the chunk-level page URL: an explicit front-matter `url:` wins; otherwise `--url-base`
+ * derives one from the source path (`java-21.md` → `<base>/java-21<suffix>`). Without either,
+ * [ParsedDocument.urlPath] stays null and the bundle bytes are identical to a pre-URL build.
+ */
+private fun withUrl(document: ParsedDocument, options: Options): ParsedDocument {
+    val base = options.urlBase
+    if (document.urlPath != null || base == null) return document
+    val page = document.sourcePath.removeSuffix(".md") + options.urlSuffix
+    return document.copy(urlPath = if (base.isEmpty()) page else base.trimEnd('/') + "/" + page)
+}
+
 /** The in-repo hashed random projection: weight-free, deterministic, always available. */
 private fun embedWithHrp(chunks: List<Chunk>, dimensions: Int): Pair<EmbeddingInfo, FloatArray> {
     val info = EmbeddingInfo(
@@ -145,13 +157,16 @@ internal data class Options(
     val dimensions: Int,
     val clusters: String?,
     val builtAt: String?,
+    val urlBase: String?,
+    val urlSuffix: String,
 ) {
     companion object {
         const val USAGE: String =
             "usage: rag-bundler --docs <dir> --out <file> --content-version <n> " +
                 "[--categories a,b,c] [--no-embed] [--embedder hrp|leaf] " +
                 "[--dimensions 256 (hrp only)] " +
-                "[--clusters clusters.json] [--built-at <iso-instant>]"
+                "[--clusters clusters.json] [--built-at <iso-instant>] " +
+                "[--url-base <prefix>] [--url-suffix <.html>]"
 
         fun parse(args: Array<String>): Options? {
             fun value(name: String): String? =
@@ -171,6 +186,8 @@ internal data class Options(
                     ?: SkaiNetHashedProjectionEmbedder.DEFAULT_DIMENSIONS,
                 clusters = value("--clusters"),
                 builtAt = value("--built-at"),
+                urlBase = value("--url-base"),
+                urlSuffix = value("--url-suffix") ?: ".html",
             )
         }
     }
