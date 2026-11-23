@@ -1,0 +1,32 @@
+{
+  "name": "@skainet/antora-site-search",
+  "version": "0.1.0",
+  "description": "Client-side hybrid search (BM25 + SKaiNET vectors) for Antora sites: the site is indexed at build time by the same Kotlin code that answers queries in the visitor's browser, and no query ever leaves the tab.",
+  "license": "MIT",
+  "author": "SKaiNET developers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SKaiNET-developers/SKaiNET-rag.git",
+    "directory": "site-search/antora-extension"
+  },
+  "keywords": [
+    "antora",
+    "antora-extension",
+    "search",
+    "skainet"
+  ],
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "parse5": "^7.3.0"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\""
+  }
+}

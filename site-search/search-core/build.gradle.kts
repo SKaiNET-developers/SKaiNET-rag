@@ -39,3 +39,10 @@ val packDist by tasks.registering(Sync::class) {
     from("glue")
     into(layout.buildDirectory.dir("dist/engine"))
 }
+
+// The same engine folder, laid into the Antora extension so the npm package is self-contained.
+val packEngineNpm by tasks.registering(Sync::class) {
+    dependsOn(packDist)
+    from(layout.buildDirectory.dir("dist/engine"))
+    into(rootProject.layout.projectDirectory.dir("site-search/antora-extension/dist/engine"))
+}
