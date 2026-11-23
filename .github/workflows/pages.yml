@@ -68,6 +68,30 @@ jobs:
           ./gradlew :samples:web:wasmJsBrowserDistribution
           :samples:site-search:wasmJsBrowserDistribution
 
+      # The site-search engine: unit tests on both targets (the wasm run pins the same bundle
+      # digest the JVM run pins — cross-target byte determinism), then the packed dists feed
+      # the Antora extension's test suite and a Node smoke test of the public JS API.
+      - name: Test and pack the site-search engine
+        run: >
+          ./gradlew -Plocalrag.noLeaf=true
+          :site-search:indexer:jvmTest :site-search:indexer:wasmJsTest
+          :site-search:search-core:packEngineNpm :site-search:indexer:packNpm
+
+      # Node >= 22: the engine and the indexer are WasmGC modules; the runner default is older.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test the Antora extension against the real engine
+        working-directory: site-search/antora-extension
+        run: npm ci && npm test
+
+      - name: Smoke-test the packed engine over HTTP
+        working-directory: site-search/search-core
+        run: >
+          node smoke/smoke.mjs build/dist/engine
+          ../../samples/app/src/commonMain/composeResources/files/docs.lrb
+
       # The widget's result links point at pages/<doc>.html#<anchor>; the generator renders
       # those pages with anchors from the same slug rule the chunker used.
       - name: Render the demo site pages

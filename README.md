@@ -29,6 +29,9 @@ jvm artifacts; D8 dexes Java 21 bytecode; the browser runs the retrieval stack a
 | `samples/app` | The **Compose Multiplatform** sample: the entire UI (search screen, status, passage cards) is one `commonMain` `App()` composable shared by Android, desktop and iOS; the bundle ships as a compose resource so every target loads identical bytes. `samples/app-android` is the thin `com.android.application` shell AGP 9 requires (KMP module + application plugin cannot share a module). |
 | `samples/web` | The **browser demo**: the same `LocalRag` runtime compiled to Kotlin/Wasm behind a static HTML page — hybrid retrieval (BM25 + SKaiNET HRP vectors, ~700 KB of script + wasm) entirely in the tab, serving the same checked-in bundle the apps ship. `?q=…` deep-links a query. `wasmJsBrowserDistribution` emits a folder any static host (GitHub Pages included — see `.github/workflows/pages.yml`) serves as-is. |
 | `samples/site-search` | The **static-site search widget**: the engine as a documentation site would embed it — one `<div>` + one `<script data-bundle=…>` tag, and every result links to the page and `#heading` anchor its chunk came from (`Passage.href`, carried in the bundle via the bundler's `--url-base`/front-matter `url:`). The sibling `generator` module renders the demo corpus into those pages with anchors from the same `Slugs` rule the chunker used, so links are correct by construction. |
+| `site-search/search-core` | **L1 of the site-search engine**: the retrieval stack compiled to Kotlin/Wasm behind a three-call `@JsExport` boundary; `packDist` emits the deployable engine folder — the compiler's own ES modules (~547 KB wasm, no bundler pass) plus `glue/skainet-search.js`, the handwritten public JS API (`skainetSearch.init({bundleUrl})` → flat hits `{url, anchor, title, heading, text, score, source, component, headingPath}`). |
+| `site-search/indexer` | The **build-time half**: neutral page/section records (JSON) in, one deterministic `.lrb` out, embeddings computed through the same compiled HRP the browser queries with. Targets jvm + `wasmJs(nodejs)` — the test suite pins one FNV digest of the fixture bundle on **both** targets. |
+| `site-search/antora-extension` | **`@skainet/antora-site-search`** (npm, Node ≥ 22): hybrid search for [Antora](https://antora.org) sites in one playbook line — parse5 extraction of the rendered pages, the wasm indexer in-process, `_search/search.lrb` + engine published with the site, and the same `SITE_SEARCH_PROVIDER` UI contract as antora-lunr-extension so existing UI hooks light up. |
 
 ## Quick start
 
@@ -56,6 +59,17 @@ And as a **site search engine** — the widget plus the rendered demo pages it l
   --args="--docs $PWD/samples/docs-java --out $PWD/samples/site-search/build/dist/wasmJs/productionExecutable/pages"
 python3 -m http.server -d samples/site-search/build/dist/wasmJs/productionExecutable 8081
 open "http://localhost:8081/?q=which+JEP+introduced+virtual+threads"
+```
+
+The **site-search engine** proper — packed dists, the indexer's cross-target tests, and the
+Antora extension's suite against the real wasm engine (Node ≥ 22):
+
+```bash
+./gradlew :site-search:search-core:packEngineNpm :site-search:indexer:packNpm \
+  :site-search:indexer:jvmTest :site-search:indexer:wasmJsTest
+cd site-search/antora-extension && npm install && npm test
+node ../search-core/smoke/smoke.mjs ../search-core/build/dist/engine \
+  ../../samples/app/src/commonMain/composeResources/files/docs.lrb
 ```
 
 The same corpus with **neural vectors** instead of the hashed projection — publish the
