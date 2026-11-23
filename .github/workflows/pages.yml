@@ -42,7 +42,8 @@ jobs:
       # -Plocalrag.noLeaf: the embedding-leaf-skainet cartridge lives only in a developer's
       # ~/.m2, so CI compiles the bundler without the leaf edge module and indexes with the
       # weight-free HRP embedder — the same embedder the published page runs. --built-at is
-      # pinned for the byte-identity check below.
+      # pinned for the byte-identity check below. --url-base matches the pages/ directory the
+      # site-search sample publishes, so every chunk carries a working page#anchor link.
       - name: Index the corpus into the bundle (HRP embeddings in-process)
         run: >
           ./gradlew -Plocalrag.noLeaf=true :rag-bundler:run
@@ -50,7 +51,8 @@ jobs:
           --out $PWD/samples/app/src/commonMain/composeResources/files/docs.lrb
           --content-version 1
           --categories release,jvm,language,api,tools,internal
-          --built-at 2026-10-10T16:57:00.295376Z"
+          --built-at 2026-10-10T16:57:00.295376Z
+          --url-base pages"
 
       # The LRB2 encoding is deterministic (identical content → identical bytes), so a
       # reindex of unchanged sources must reproduce the checked-in bundle bit for bit.
@@ -61,12 +63,30 @@ jobs:
           samples/docs-java
           samples/app/src/commonMain/composeResources/files/docs.lrb
 
-      - name: Build the wasm distribution
-        run: ./gradlew :samples:web:wasmJsBrowserDistribution
+      - name: Build the wasm distributions
+        run: >
+          ./gradlew :samples:web:wasmJsBrowserDistribution
+          :samples:site-search:wasmJsBrowserDistribution
+
+      # The widget's result links point at pages/<doc>.html#<anchor>; the generator renders
+      # those pages with anchors from the same slug rule the chunker used.
+      - name: Render the demo site pages
+        run: >
+          ./gradlew :samples:site-search:generator:run
+          --args="--docs $PWD/samples/docs-java --out $PWD/build/site-search-pages"
+
+      # One Pages artifact: / = the research demo, /site-search/ = the widget on its demo site.
+      - name: Compose the site
+        run: |
+          mkdir -p build/site
+          cp -R samples/web/build/dist/wasmJs/productionExecutable/. build/site/
+          mkdir -p build/site/site-search
+          cp -R samples/site-search/build/dist/wasmJs/productionExecutable/. build/site/site-search/
+          cp -R build/site-search-pages/. build/site/site-search/pages/
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: samples/web/build/dist/wasmJs/productionExecutable
+          path: build/site
 
   deploy:
     needs: build
