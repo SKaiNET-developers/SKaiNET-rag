@@ -51,3 +51,12 @@ test('an antora page extracts to anchored section records', () => {
 test('a page without an article yields null', () => {
   assert.equal(extractPage('<html><body><p>redirecting…</p></body></html>', page), null)
 })
+
+test('a page with neither a catalog title nor an h1 falls back to a heading, then the filename', () => {
+  const untitled = { ...page, title: undefined, urlPath: '/skainet/0.57/reference/coverage-matrix.html' }
+  const headed =
+    '<html><body><article class="doc"><h2 id="_guide">SKaiNET Graph DSL</h2><p>Body.</p></article></body></html>'
+  assert.equal(extractPage(headed, untitled).title, 'SKaiNET Graph DSL', 'the first heading is the de-facto title')
+  const bare = '<html><body><article class="doc"><p>Generated coverage matrix.</p></article></body></html>'
+  assert.equal(extractPage(bare, untitled).title, 'coverage-matrix', 'the filename is the last resort')
+})

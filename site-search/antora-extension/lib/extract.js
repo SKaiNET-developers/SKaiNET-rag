@@ -88,6 +88,17 @@ function extractPage (html, page) {
   flush()
   if (!sections.length) return null
 
+  // A page can have neither a catalog title nor an h1 (seen in the wild: pages authored
+  // starting at `== ` instead of a doctitle); the indexer requires one. The first section
+  // heading is the de-facto title of such a page; the output filename is the last resort.
+  if (!title) {
+    const headed = sections.find((s) => s.headingPath.length)
+    title =
+      (headed && headed.headingPath[0]) ||
+      (page.urlPath || '').split('/').pop().replace(/\.html$/, '') ||
+      page.docId
+  }
+
   return {
     docId: page.docId,
     title,

@@ -1,6 +1,6 @@
 {
   "name": "@skainet/antora-site-search",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Client-side hybrid search (BM25 + SKaiNET vectors) for Antora sites: the site is indexed at build time by the same Kotlin code that answers queries in the visitor's browser, and no query ever leaves the tab.",
   "license": "MIT",
   "author": "SKaiNET developers",
