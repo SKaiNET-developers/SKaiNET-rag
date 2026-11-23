@@ -85,6 +85,33 @@ class BundleCodecTest {
     }
 
     @Test
+    fun `url metadata round trips and absent fields write no json`() {
+        val linked = Fixture.chunks.first().copy(urlPath = "pages/x.html", anchor = "why")
+        val bytes = BundleCodec.encode(
+            chunks = listOf(linked),
+            vectors = null,
+            clusters = emptyList(),
+            contentVersion = 1,
+            builtAt = "now",
+            embedding = null,
+        )
+        val decoded = BundleCodec.decode(bytes).chunks.single()
+        assertEquals("pages/x.html", decoded.urlPath)
+        assertEquals("why", decoded.anchor)
+
+        // A chunk without the metadata serializes to exactly the pre-URL bytes.
+        val bare = BundleCodec.encode(
+            chunks = listOf(Fixture.chunks.first()),
+            vectors = null,
+            clusters = emptyList(),
+            contentVersion = 1,
+            builtAt = "now",
+            embedding = null,
+        )
+        assertTrue("urlPath" !in bare.decodeToString())
+    }
+
+    @Test
     fun `refuses vectors without an embedding block`() {
         assertFailsWith<IllegalArgumentException> {
             BundleCodec.encode(

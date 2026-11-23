@@ -68,6 +68,18 @@ class ChunkerTest {
     }
 
     @Test
+    fun `url metadata threads through with the heading slug as anchor`() {
+        val chunks = Chunker().chunk(
+            document("What shipped.\n\n## Why virtual threads?\nScalability.")
+                .copy(urlPath = "pages/java-21-api.html"),
+        ).chunks
+
+        assertEquals("pages/java-21-api.html", chunks[0].urlPath)
+        assertNull(chunks[0].anchor) // the intro links to the page top, not to "#intro"
+        assertEquals("why-virtual-threads", chunks[1].anchor)
+    }
+
+    @Test
     fun `a section over budget warns and points at itself`() {
         val body = "## Growing section\n" + "word ".repeat(30)
         val issue = Chunker(ChunkerConfig(maxChunkTokens = 20)).chunk(document(body)).issues.single()

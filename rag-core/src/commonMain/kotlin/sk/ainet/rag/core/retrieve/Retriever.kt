@@ -72,6 +72,8 @@ class Retriever(
             screenLink = chunk.screen,
             score = hit.score,
             source = source,
+            urlPath = chunk.urlPath,
+            anchor = chunk.anchor,
         )
     }
 

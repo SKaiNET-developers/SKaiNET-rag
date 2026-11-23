@@ -31,6 +31,8 @@ data class ParsedDocument(
     val status: DocumentStatus,
     val body: String,
     val sourcePath: String,
+    /** Site-root-relative page URL (front-matter `url:`), e.g. `pages/java-21.html`. */
+    val urlPath: String? = null,
 )
 
 /**

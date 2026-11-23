@@ -45,6 +45,18 @@ class FrontMatterParserTest {
     }
 
     @Test
+    fun `an optional url is lifted and its absence reads as null`() {
+        assertNull(FrontMatterParser.parse("java-21-api.md", wellFormed).document?.urlPath)
+
+        val withUrl = wellFormed.replaceFirst(
+            "status: published",
+            "status: published\nurl: pages/java-21-api.html",
+        )
+        val document = assertNotNull(FrontMatterParser.parse("java-21-api.md", withUrl).document)
+        assertEquals("pages/java-21-api.html", document.urlPath)
+    }
+
+    @Test
     fun `a file without front matter fails at line 1`() {
         val result = FrontMatterParser.parse("bad.md", "# Just a heading\n")
         assertNull(result.document)

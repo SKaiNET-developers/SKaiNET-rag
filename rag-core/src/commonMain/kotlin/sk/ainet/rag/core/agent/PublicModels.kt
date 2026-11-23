@@ -101,7 +101,15 @@ data class Passage(
     val screenLink: String?,
     val score: Float,
     val source: MatchSource,
-)
+    /** Site-root-relative URL of the source page; null when the bundle carries no site metadata. */
+    val urlPath: String? = null,
+    /** Fragment id of the passage's heading on that page, without the `#`. */
+    val anchor: String? = null,
+) {
+    /** Ready-to-render link to the passage on its page, or null without URL metadata. */
+    val href: String?
+        get() = urlPath?.let { path -> anchor?.let { "$path#$it" } ?: path }
+}
 
 sealed interface LocalRagState {
     data object Idle : LocalRagState

@@ -116,6 +116,7 @@ object FrontMatterParser {
             status = status,
             body = body,
             sourcePath = sourcePath,
+            urlPath = fields["url"]?.let { scalar(it.raw) },
         )
     }
 

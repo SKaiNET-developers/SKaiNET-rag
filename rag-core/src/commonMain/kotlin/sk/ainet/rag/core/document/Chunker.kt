@@ -34,8 +34,9 @@ class Chunker(private val config: ChunkerConfig = ChunkerConfig()) {
             val tokenCount = Tokenizer.tokenize(embeddedText).size
             checkBudget(document, section, tokenCount, issues)
 
+            val slug = Slugs.of(section.heading)
             chunks += Chunk(
-                chunkId = document.id + "#" + slugOf(section.heading),
+                chunkId = document.id + "#" + slug,
                 docId = document.id,
                 title = document.title,
                 heading = section.heading,
@@ -47,6 +48,8 @@ class Chunker(private val config: ChunkerConfig = ChunkerConfig()) {
                 embeddedText = embeddedText,
                 displayText = displayText,
                 tokenCount = tokenCount,
+                urlPath = document.urlPath,
+                anchor = section.heading?.let { slug },
             )
         }
         return ChunkResult(chunks, issues)
@@ -98,15 +101,6 @@ class Chunker(private val config: ChunkerConfig = ChunkerConfig()) {
         return sections
     }
 
-    /** Deterministic: rebuilding an unchanged document reproduces every chunk id. */
-    private fun slugOf(heading: String?): String {
-        if (heading == null) return "intro"
-        val slug = buildString {
-            for (c in heading.lowercase()) append(if (c.isLetterOrDigit()) c else '-')
-        }.trim('-').replace(SQUEEZED_DASHES, "-")
-        return slug.ifEmpty { "section" }
-    }
-
     private data class Section(val heading: String?, val body: String, val line: Int)
 
     companion object {
@@ -114,6 +108,5 @@ class Chunker(private val config: ChunkerConfig = ChunkerConfig()) {
         const val VERSION: Int = 3
 
         private val HEADING_TWO = Regex("^##\\s+(.+?)\\s*$")
-        private val SQUEEZED_DASHES = Regex("-+")
     }
 }

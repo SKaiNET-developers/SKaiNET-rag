@@ -57,6 +57,10 @@ data class StoredChunk(
     val appVersionMin: String? = null,
     val appVersionMax: String? = null,
     val text: String,
+    // Both null-defaulted and suppressed from JSON when absent (explicitNulls = false), so
+    // bundles without site metadata keep their exact bytes and older runtimes read newer bundles.
+    val urlPath: String? = null,
+    val anchor: String? = null,
 ) {
     companion object {
         fun from(chunk: Chunk) = StoredChunk(
@@ -70,6 +74,8 @@ data class StoredChunk(
             appVersionMin = chunk.appVersionMin,
             appVersionMax = chunk.appVersionMax,
             text = chunk.displayText,
+            urlPath = chunk.urlPath,
+            anchor = chunk.anchor,
         )
     }
 }

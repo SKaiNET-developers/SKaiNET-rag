@@ -25,4 +25,8 @@ data class Chunk(
     val embeddedText: String,
     val displayText: String,
     val tokenCount: Int,
+    /** Site-root-relative URL of the page this chunk came from; null when the corpus has no site. */
+    val urlPath: String? = null,
+    /** Fragment identifier of the chunk's heading on that page, without the `#`; null for the intro. */
+    val anchor: String? = null,
 )
