@@ -14,7 +14,6 @@ import sk.ainet.rag.core.document.ValidationConfig
 import sk.ainet.rag.embedder.skainet.SkaiNetHashedProjectionEmbedder
 import java.io.File
 import kotlin.system.exitProcess
-import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
 
 /**
@@ -48,7 +47,7 @@ fun main(args: Array<String>) {
         if (document.status == DocumentStatus.PUBLISHED) documents += document
     }
 
-    val today = LocalDate.parse(java.time.LocalDate.now().toString())
+    val today = java.time.LocalDate.now().toString()
     issues += DocumentValidator(ValidationConfig(categories = options.categories)).validate(documents, today)
 
     val chunker = Chunker()

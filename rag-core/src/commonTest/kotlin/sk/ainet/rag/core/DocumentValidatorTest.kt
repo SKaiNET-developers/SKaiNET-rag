@@ -4,14 +4,13 @@ import sk.ainet.rag.core.document.DocumentStatus
 import sk.ainet.rag.core.document.DocumentValidator
 import sk.ainet.rag.core.document.ParsedDocument
 import sk.ainet.rag.core.document.ValidationConfig
-import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class DocumentValidatorTest {
 
-    private val today = LocalDate.parse("2026-10-11")
+    private val today = "2026-10-11"
 
     private fun document(
         id: String = "java-21-api",

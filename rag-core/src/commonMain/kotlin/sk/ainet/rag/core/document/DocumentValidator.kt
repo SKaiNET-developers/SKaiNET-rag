@@ -1,8 +1,5 @@
 package sk.ainet.rag.core.document
 
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.daysUntil
-
 data class ValidationConfig(
     val categories: List<String> = emptyList(),
     val screenUriPattern: String? = null,
@@ -17,13 +14,17 @@ data class ValidationConfig(
  */
 class DocumentValidator(private val config: ValidationConfig) {
 
-    fun validate(documents: List<ParsedDocument>, today: LocalDate): List<DocumentIssue> {
+    /** [today] is an ISO `YYYY-MM-DD` date — the only calendar shape the front matter speaks. */
+    fun validate(documents: List<ParsedDocument>, today: String): List<DocumentIssue> {
+        val todayEpochDay = requireNotNull(IsoDate.epochDay(today)) {
+            "today `$today` is not an ISO calendar date"
+        }
         val issues = mutableListOf<DocumentIssue>()
         reportDuplicateIds(documents, issues)
         for (document in documents) {
             checkCategory(document, issues)
             checkScreen(document, issues)
-            checkFreshness(document, today, issues)
+            checkFreshness(document, todayEpochDay, issues)
         }
         return issues
     }
@@ -62,13 +63,13 @@ class DocumentValidator(private val config: ValidationConfig) {
         )
     }
 
-    private fun checkFreshness(document: ParsedDocument, today: LocalDate, issues: MutableList<DocumentIssue>) {
-        val reviewed = runCatching { LocalDate.parse(document.lastReviewed) }.getOrNull()
+    private fun checkFreshness(document: ParsedDocument, todayEpochDay: Long, issues: MutableList<DocumentIssue>) {
+        val reviewed = IsoDate.epochDay(document.lastReviewed)
         if (reviewed == null) {
             issues += error(document, "last_reviewed `${document.lastReviewed}` cannot be parsed as a date")
             return
         }
-        val ageDays = reviewed.daysUntil(today)
+        val ageDays = todayEpochDay - reviewed
         if (ageDays > config.staleAfterDays) {
             issues += error(
                 document,
