@@ -144,6 +144,14 @@ async function engineAssets () {
       contents: await fsp.readFile(ospath.join(__dirname, 'assets', 'search-ui.js')),
       out: { path: `${SEARCH_DIR}/search-ui.js` },
     },
+    {
+      // Browsers get the module format from the script tag, but a Node consumer of the
+      // published site (smoke test, determinism canary) resolves .js by the nearest
+      // package.json — without this marker the ES-module engine parses as CommonJS.
+      mediaType: 'application/json',
+      contents: Buffer.from('{"type":"module"}\n'),
+      out: { path: `${SEARCH_DIR}/package.json` },
+    },
   ]
   for (const name of names) {
     assets.push({

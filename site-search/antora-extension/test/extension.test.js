@@ -92,6 +92,7 @@ test('beforePublish indexes the rendered pages and publishes the engine', { skip
   const paths = catalogs.siteCatalog.files.map((f) => f.out.path)
   assert.ok(paths.includes('_search/search.lrb'))
   assert.ok(paths.includes('_search/search-ui.js'))
+  assert.ok(paths.includes('_search/package.json'))
   assert.ok(paths.includes('_search/skainet-search.js'))
   assert.ok(paths.includes('_search/skainet-search-core.wasm'))
 

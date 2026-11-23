@@ -23,8 +23,12 @@ if (input) {
 
   const ensureEngine = () => {
     enginePromise ??= (async () => {
-      const { skainetSearch } = await import(`${config.enginePath}/skainet-search.js`);
-      return skainetSearch.init({ bundleUrl: config.bundlePath });
+      // The dataset paths are page-relative; a bare import() would resolve them against this
+      // module's URL (_search/) instead of the page — resolve against the document explicitly.
+      const { skainetSearch } = await import(
+        new URL(`${config.enginePath}/skainet-search.js`, document.baseURI).href
+      );
+      return skainetSearch.init({ bundleUrl: new URL(config.bundlePath, document.baseURI).href });
     })();
     return enginePromise;
   };
