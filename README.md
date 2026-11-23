@@ -28,6 +28,7 @@ jvm artifacts; D8 dexes Java 21 bytecode; the browser runs the retrieval stack a
 | `samples/cli` | One common-source CLI compiled both as a JVM app and a **native macosArm64 executable**, answering from the same bundle. |
 | `samples/app` | The **Compose Multiplatform** sample: the entire UI (search screen, status, passage cards) is one `commonMain` `App()` composable shared by Android, desktop and iOS; the bundle ships as a compose resource so every target loads identical bytes. `samples/app-android` is the thin `com.android.application` shell AGP 9 requires (KMP module + application plugin cannot share a module). |
 | `samples/web` | The **browser demo**: the same `LocalRag` runtime compiled to Kotlin/Wasm behind a static HTML page — hybrid retrieval (BM25 + SKaiNET HRP vectors, ~700 KB of script + wasm) entirely in the tab, serving the same checked-in bundle the apps ship. `?q=…` deep-links a query. `wasmJsBrowserDistribution` emits a folder any static host (GitHub Pages included — see `.github/workflows/pages.yml`) serves as-is. |
+| `samples/site-search` | The **static-site search widget**: the engine as a documentation site would embed it — one `<div>` + one `<script data-bundle=…>` tag, and every result links to the page and `#heading` anchor its chunk came from (`Passage.href`, carried in the bundle via the bundler's `--url-base`/front-matter `url:`). The sibling `generator` module renders the demo corpus into those pages with anchors from the same `Slugs` rule the chunker used, so links are correct by construction. |
 
 ## Quick start
 
@@ -46,6 +47,15 @@ server (everything after the one corpus fetch stays in the tab):
 ./gradlew :samples:web:wasmJsBrowserDistribution
 python3 -m http.server -d samples/web/build/dist/wasmJs/productionExecutable 8080
 open "http://localhost:8080/?q=which+JEP+introduced+virtual+threads"
+```
+
+And as a **site search engine** — the widget plus the rendered demo pages it links into:
+
+```bash
+./gradlew :samples:site-search:wasmJsBrowserDistribution :samples:site-search:generator:run \
+  --args="--docs $PWD/samples/docs-java --out $PWD/samples/site-search/build/dist/wasmJs/productionExecutable/pages"
+python3 -m http.server -d samples/site-search/build/dist/wasmJs/productionExecutable 8081
+open "http://localhost:8081/?q=which+JEP+introduced+virtual+threads"
 ```
 
 The same corpus with **neural vectors** instead of the hashed projection — publish the

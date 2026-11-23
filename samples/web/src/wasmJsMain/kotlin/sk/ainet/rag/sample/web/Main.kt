@@ -139,7 +139,17 @@ private fun card(passage: Passage): HTMLElement {
     card.className = "card"
 
     val title = document.createElement("h3") as HTMLElement
-    title.textContent = listOfNotNull(passage.title, passage.heading).joinToString(" — ")
+    val label = listOfNotNull(passage.title, passage.heading).joinToString(" — ")
+    // The bundle carries page URLs for the site-search sample, published under site-search/.
+    val href = passage.href
+    if (href != null) {
+        val link = document.createElement("a") as org.w3c.dom.HTMLAnchorElement
+        link.href = "site-search/$href"
+        link.textContent = label
+        title.appendChild(link)
+    } else {
+        title.textContent = label
+    }
     card.appendChild(title)
 
     val meta = document.createElement("div") as HTMLElement
